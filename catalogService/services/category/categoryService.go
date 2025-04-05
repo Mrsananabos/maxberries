@@ -13,10 +13,10 @@ import (
 
 type ServiceInterface interface {
 	GetAll() ([]models.Category, error)
+	GetByIdGetById(id int64) (models.Category, error)
 	Save(category models.Category)
 	Delete(id int64)
 	Update(id int64, category models.Category)
-	UpdateFields(id int64, fields map[string]interface{})
 }
 
 type Service struct {
@@ -75,18 +75,6 @@ func (service Service) Delete(id int64) error {
 	}
 
 	return nil
-}
-
-func (service Service) UpdateFields(id int64, fields map[string]interface{}) {
-	rsl := config.DB.Model(&models.Category{}).Where("id = ?", id).Updates(fields)
-
-	if rsl.Error != nil {
-		fmt.Println(rsl.Error)
-	}
-
-	if rsl.RowsAffected != 1 {
-		fmt.Printf("Не удалось обновить категорию с id = %d\n", id)
-	}
 }
 
 func (service Service) Update(category models.Category) (err error) {

@@ -20,6 +20,6 @@ CREATE TABLE IF NOT EXISTS products
 
 -- +goose Down
 -- +goose StatementBegin
--- DROP TABLE IF EXISTS products;
--- DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS products;
+DROP TABLE IF EXISTS categories;
 -- +goose StatementEnd

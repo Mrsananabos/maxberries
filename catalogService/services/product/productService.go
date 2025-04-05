@@ -14,9 +14,10 @@ import (
 
 type ServiceInterface interface {
 	GetAll() []models.Product
+	GetById(id int64) (models.Product, error)
 	Save(Product models.Product)
 	Delete(id int64)
-	UpdateFieldsById(id int64, fields map[string]interface{})
+	Update(Product models.Product)
 }
 
 type Service struct {
@@ -102,18 +103,6 @@ func (service Service) Delete(id int64) error {
 	}
 
 	return nil
-}
-
-func (service Service) UpdateFieldsById(id int64, fields map[string]interface{}) {
-	rsl := config.DB.Model(&models.Product{}).Where("id = ?", id).Updates(fields)
-
-	if rsl.Error != nil {
-		fmt.Println(rsl.Error)
-	}
-
-	if rsl.RowsAffected != 1 {
-		fmt.Printf("Can`t update product with с id = %d\n", id)
-	}
 }
 
 func validateProduct(product models.Product) error {
