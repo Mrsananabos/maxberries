@@ -7,7 +7,7 @@ import (
 
 type Config struct {
 	Database   Database
-	ServerPort string `envconfig:"SERVER_PORT" default:"80"`
+	ServerPort string `envconfig:"SERVER_PORT" default:":8080"`
 }
 
 type Database struct {
@@ -20,7 +20,7 @@ type Database struct {
 
 func NewParsedConfig() Config {
 	return Config{
-		ServerPort: ":8080",
+		ServerPort: getEnv("PORT"),
 		Database: Database{
 			Host:     getEnv("DB_HOST"),
 			Port:     getEnv("DB_PORT"),
