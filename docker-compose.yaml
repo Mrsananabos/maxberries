@@ -1,11 +1,12 @@
 services:
-  catalog_service:
+  catalogservice:
     build: ./catalogService
     environment:
-      - USER_DB=${USER_DB}
-      - PASSWORD_DB=${PASSWORD_DB}
-      - HOST_DB=${HOST_DB}
-      - PORT_DB=${PORT_DB}
+      - DB_HOST=${DATABASE_ADDRESS}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
     restart: unless-stopped
     ports:
       - 8080:8080

@@ -1,15 +1,17 @@
 package main
 
 import (
-	"catalogService/routes"
-	"catalogService/storage/migration"
+	"catalogService/http/rest"
 )
 
 func main() {
-	err := migration.DoMigration()
+	server, err := rest.NewServer()
 	if err != nil {
 		panic(err)
 	}
 
-	routes.LoadRoutes()
+	err = server.Run()
+	if err != nil {
+		panic(err)
+	}
 }

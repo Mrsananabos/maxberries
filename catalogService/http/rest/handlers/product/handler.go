@@ -1,21 +1,30 @@
 package category
 
 import (
-	"catalogService/models"
-	"catalogService/services/category"
+	categoryRepo "catalogService/internal/category/repository"
+	category "catalogService/internal/category/service"
+	"catalogService/internal/product/model"
+	productRepo "catalogService/internal/product/repository"
+	product "catalogService/internal/product/service"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 )
 
-var service category.Service
-
-func init() {
-	service = category.Service{}
+type Handler struct {
+	service product.Service
 }
 
-func GetAllCategories(c *gin.Context) {
-	categories, err := service.GetAll()
+func NewHandler(db *gorm.DB) Handler {
+	return Handler{
+		service: product.NewService(productRepo.NewRepository(db),
+			category.NewService(categoryRepo.NewRepository(db))),
+	}
+}
+
+func (h Handler) GetAllProducts(c *gin.Context) {
+	categories, err := h.service.GetAll()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -23,7 +32,7 @@ func GetAllCategories(c *gin.Context) {
 	c.JSON(http.StatusOK, categories)
 }
 
-func GetCategoryById(c *gin.Context) {
+func (h Handler) GetProductById(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
@@ -31,24 +40,24 @@ func GetCategoryById(c *gin.Context) {
 		return
 	}
 
-	foundCategory, err := service.GetById(id)
+	foundProduct, err := h.service.GetById(id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, foundCategory)
+	c.JSON(http.StatusOK, foundProduct)
 }
 
-func SaveCategory(c *gin.Context) {
-	var categoryRequest models.Category
+func (h Handler) SaveProduct(c *gin.Context) {
+	var categoryRequest model.Product
 
 	if err := c.ShouldBindJSON(&categoryRequest); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err := service.Save(categoryRequest)
+	err := h.service.Create(categoryRequest)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -57,7 +66,7 @@ func SaveCategory(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func DeleteCategory(c *gin.Context) {
+func (h Handler) DeleteProduct(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
@@ -65,16 +74,16 @@ func DeleteCategory(c *gin.Context) {
 		return
 	}
 
-	err = service.Delete(id)
+	err = h.service.Delete(id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Category deleted successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Product deleted successfully"})
 }
 
-func UpdateCategory(c *gin.Context) {
+func (h Handler) UpdateProduct(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
@@ -82,18 +91,18 @@ func UpdateCategory(c *gin.Context) {
 		return
 	}
 
-	var updatedCategory models.Category
-	if err = c.ShouldBindJSON(&updatedCategory); err != nil {
+	var updatedProduct model.Product
+	if err = c.ShouldBindJSON(&updatedProduct); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	updatedCategory.Id = id
+	updatedProduct.Id = id
 
-	err = service.Update(updatedCategory)
+	err = h.service.Update(updatedProduct)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Category updated successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Product updated successfully"})
 }
