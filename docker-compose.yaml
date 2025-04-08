@@ -1,0 +1,25 @@
+services:
+  catalogservice:
+    build: ./catalogService
+    environment:
+      - DB_HOST=${DATABASE_ADDRESS}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+
+  postgresql:
+    image: docker.io/bitnami/postgresql:17
+    ports:
+      - '5432:5432'
+    volumes:
+      - 'postgresql_data:/bitnami/postgresql'
+    environment:
+      - 'ALLOW_EMPTY_PASSWORD=yes'
+
+volumes:
+  postgresql_data:
+    driver: local
