@@ -11,6 +11,17 @@ services:
     ports:
       - 8080:8080
 
+  backgroundworkerservice:
+    build:
+      context: .
+      dockerfile: backgroundWorkerService/Dockerfile
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_DB=${REDIS_DB}
+      - FIXER_TOKEN=${FIXER_TOKEN}
+    restart: unless-stopped
+
   postgresql:
     image: docker.io/bitnami/postgresql:17
     ports:
@@ -19,6 +30,12 @@ services:
       - 'postgresql_data:/bitnami/postgresql'
     environment:
       - 'ALLOW_EMPTY_PASSWORD=yes'
+  redis:
+    image: 'bitnami/redis:latest'
+    ports:
+      - '6379:6379'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
 
 volumes:
   postgresql_data:
