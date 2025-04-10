@@ -15,7 +15,7 @@ type Server struct {
 func NewServer() (*Server, error) {
 	cnf := configs.NewParsedConfig()
 
-	database, err := db.Connect(db.ConfingDB{
+	database, err := db.Connect(db.ConfigDB{
 		Host:     cnf.Database.Host,
 		Port:     cnf.Database.Port,
 		User:     cnf.Database.User,
