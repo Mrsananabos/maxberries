@@ -46,7 +46,7 @@ func (h Handler) GetCategoryById(c *gin.Context) {
 	c.JSON(http.StatusOK, foundCategory)
 }
 
-func (h Handler) SaveCategory(c *gin.Context) {
+func (h Handler) CreateCategory(c *gin.Context) {
 	var categoryRequest model.Category
 
 	if err := c.ShouldBindJSON(&categoryRequest); err != nil {
@@ -60,7 +60,7 @@ func (h Handler) SaveCategory(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, gin.H{"message": "Category created successfully"})
 }
 
 func (h Handler) DeleteCategory(c *gin.Context) {

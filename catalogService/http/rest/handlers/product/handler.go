@@ -63,7 +63,7 @@ func (h Handler) SaveProduct(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, gin.H{"message": "Product created successfully"})
 }
 
 func (h Handler) DeleteProduct(c *gin.Context) {
