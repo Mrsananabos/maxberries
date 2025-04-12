@@ -42,12 +42,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	log.Println("Background Worker Service started")
 
-	err = server.Run()
-	if err != nil {
-		panic(err)
-	}
+	go func() {
+		log.Println("Background Worker Service is starting")
+		err = server.Run()
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+	}()
 
 	<-ctx.Done()
 	log.Println("Background Worker Service stopped")
