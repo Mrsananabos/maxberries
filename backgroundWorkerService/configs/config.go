@@ -7,6 +7,7 @@ import (
 )
 
 type Config struct {
+	Port             string
 	Redis            Redis
 	FixerAccessToken string
 }
@@ -15,6 +16,7 @@ type Redis struct {
 	Host string
 	Port string
 	DB   int
+	TTL  int
 }
 
 func NewParsedConfig() Config {
@@ -23,7 +25,9 @@ func NewParsedConfig() Config {
 			Host: getEnv("REDIS_HOST"),
 			Port: getEnv("REDIS_PORT"),
 			DB:   getIntEnv("REDIS_DB"),
+			TTL:  getIntEnv("REDIS_TTL"),
 		},
+		Port:             getEnv("BACKGROUND_SERVICE_PORT"),
 		FixerAccessToken: getEnv("FIXER_TOKEN"),
 	}
 }
