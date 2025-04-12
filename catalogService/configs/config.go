@@ -7,20 +7,20 @@ import (
 
 type Config struct {
 	Database   Database
-	ServerPort string `envconfig:"PORT" default:":8080"`
+	ServerPort string
 }
 
 type Database struct {
-	Host     string `envconfig:"DB_HOST" required:"true"`
-	Port     string `envconfig:"DB_PORT" required:"true"`
-	User     string `envconfig:"DB_USER" required:"true"`
-	Password string `envconfig:"DB_PASSWORD" required:"true"`
-	Name     string `envconfig:"DB_NAME" required:"true"`
+	Host     string
+	Port     string
+	User     string
+	Password string
+	Name     string
 }
 
 func NewParsedConfig() Config {
 	return Config{
-		ServerPort: getEnv("PORT"),
+		ServerPort: getEnv("CATALOG_SERVICE_PORT"),
 		Database: Database{
 			Host:     getEnv("DB_HOST"),
 			Port:     getEnv("DB_PORT"),
