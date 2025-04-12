@@ -13,7 +13,7 @@ func Register(gin *gin.Engine, db *gorm.DB) {
 
 	gin.GET("/categories", categoryHandler.GetAllCategories)
 	gin.GET("/categories/:id", categoryHandler.GetCategoryById)
-	gin.POST("/categories", categoryHandler.SaveCategory)
+	gin.POST("/categories", categoryHandler.CreateCategory)
 	gin.PUT("/categories/:id", categoryHandler.UpdateCategory)
 	gin.DELETE("/categories/:id", categoryHandler.DeleteCategory)
 

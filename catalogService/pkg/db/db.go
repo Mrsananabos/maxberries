@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type ConfingDB struct {
+type ConfigDB struct {
 	Host     string
 	Port     string
 	User     string
@@ -14,7 +14,7 @@ type ConfingDB struct {
 	Name     string
 }
 
-func Connect(cnf ConfingDB) (*gorm.DB, error) {
+func Connect(cnf ConfigDB) (*gorm.DB, error) {
 	dsn := fmt.Sprintf(
 		"postgresql://%s:%s@%s:%s/%s?sslmode=disable",
 		cnf.User,

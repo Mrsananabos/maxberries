@@ -3,6 +3,7 @@ package repository
 import (
 	"catalogService/internal/product/model"
 	"catalogService/pkg/db"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -36,8 +37,8 @@ func (r Repository) GetById(id int64) (model.Product, error) {
 	return category, nil
 }
 
-func (r Repository) Create(category model.Product) error {
-	rsl := r.DB.Create(&category)
+func (r Repository) Create(product model.Product) error {
+	rsl := r.DB.Create(&product)
 
 	if rsl.Error != nil {
 		return db.HandleError(rsl.Error)
@@ -49,22 +50,18 @@ func (r Repository) Create(category model.Product) error {
 func (r Repository) Delete(id int64) error {
 	rsl := r.DB.Delete(&model.Product{}, id)
 
-	if rsl.Error != nil {
-		return db.HandleError(rsl.Error)
+	if rsl.RowsAffected != 1 {
+		return fmt.Errorf("not found product with id = %d", id)
 	}
 
 	return nil
 }
 
-func (r Repository) Update(category model.Product) (err error) {
-	rsl := r.DB.Model(&model.Product{}).Where("id = ?", category.Id).Updates(category)
-
-	if rsl.Error != nil {
-		return db.HandleError(rsl.Error)
-	}
+func (r Repository) Update(product model.Product) (err error) {
+	rsl := r.DB.Model(&model.Product{}).Where("id = ?", product.Id).Updates(product)
 
 	if rsl.RowsAffected == 0 {
-		return db.ErrObjectNotFound{}
+		return fmt.Errorf("not found product with id = %d", product.Id)
 	}
 
 	return

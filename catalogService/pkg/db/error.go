@@ -6,19 +6,23 @@ import (
 	"gorm.io/gorm"
 )
 
-type ErrObjectNotFound struct{}
-
-func (ErrObjectNotFound) Error() string {
-	return "object not found"
+type ErrObjectNotFound struct {
+	msg string
 }
 
-func (ErrObjectNotFound) Unwrap() error {
-	return fmt.Errorf("object not found")
+func (e ErrObjectNotFound) Error() string {
+	return e.msg
+}
+
+func (e ErrObjectNotFound) Unwrap() error {
+	return fmt.Errorf(e.Error())
 }
 
 func HandleError(err error) error {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return ErrObjectNotFound{}
+		return ErrObjectNotFound{
+			msg: "object not found",
+		}
 	}
 	return err
 }

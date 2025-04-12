@@ -1,7 +1,10 @@
 services:
   catalogservice:
-    build: ./catalogService
+    build:
+      context: .
+      dockerfile: catalogService/Dockerfile
     environment:
+      - PORT=${PORT}
       - DB_HOST=${DATABASE_ADDRESS}
       - DB_PORT=${DB_PORT}
       - DB_USER=${DB_USER}
