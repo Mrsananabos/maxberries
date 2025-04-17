@@ -5,7 +5,7 @@ services:
       dockerfile: catalogService/Dockerfile
     environment:
       - CATALOG_SERVICE_PORT=${CATALOG_SERVICE_PORT}
-      - DB_HOST=${DATABASE_ADDRESS}
+      - DB_HOST=${DB_ADDRESS}
       - DB_PORT=${DB_PORT}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
@@ -35,8 +35,8 @@ services:
       context: .
       dockerfile: orderService/Dockerfile
     environment:
-      - ORDER_SERVICE_PORT=${ORDER_SERVICE_PORT}
-      - DB_HOST=${DATABASE_ADDRESS}
+      - PORT=:8080
+      - DB_HOST=${DB_ADDRESS}
       - DB_PORT=${DB_PORT}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}

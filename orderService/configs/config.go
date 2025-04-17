@@ -7,7 +7,7 @@ import (
 type Config struct {
 	Services   Services
 	Database   Database
-	ServerPort string `envconfig:"ORDER_SERVICE_PORT" default:":8080"`
+	ServerPort string `envconfig:"PORT" default:":8080"`
 }
 
 type Services struct {
