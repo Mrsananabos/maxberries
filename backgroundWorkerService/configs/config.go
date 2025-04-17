@@ -3,7 +3,7 @@ package configs
 import "github.com/kelseyhightower/envconfig"
 
 type Config struct {
-	Port             string `envconfig:"BACKGROUND_SERVICE_PORT" default:":8080"`
+	Port             string `envconfig:"PORT" default:":8080"`
 	Redis            Redis
 	FixerAccessToken string `envconfig:"FIXER_TOKEN"`
 }

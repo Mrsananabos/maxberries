@@ -23,7 +23,7 @@ func NewHandler(db *gorm.DB) Handler {
 func (h Handler) GetAllCategories(c *gin.Context) {
 	categories, err := h.service.GetAll()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, categories)

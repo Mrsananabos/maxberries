@@ -4,12 +4,13 @@ services:
       context: .
       dockerfile: catalogService/Dockerfile
     environment:
-      - CATALOG_SERVICE_PORT=${CATALOG_SERVICE_PORT}
-      - DB_HOST=${DATABASE_ADDRESS}
+      - PORT=:8080
+      - DB_HOST=${DB_ADDRESS}
       - DB_PORT=${DB_PORT}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
+      - DB_SCHEMA=catalog
     restart: unless-stopped
     ports:
       - 8080:8080
@@ -19,7 +20,7 @@ services:
       context: .
       dockerfile: backgroundWorkerService/Dockerfile
     environment:
-      - BACKGROUND_SERVICE_PORT=:8080
+      - PORT=:8080
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_DB=${REDIS_DB}

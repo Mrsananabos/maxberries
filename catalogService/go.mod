@@ -5,6 +5,7 @@ go 1.24.0
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/gin-gonic/gin v1.10.0
+	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/shopspring/decimal v1.4.0
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.25.12
