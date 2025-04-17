@@ -13,7 +13,10 @@ type Server struct {
 }
 
 func NewServer() (*Server, error) {
-	cnf := configs.NewParsedConfig()
+	cnf, err := configs.NewParsedConfig()
+	if err != nil {
+		return nil, err
+	}
 
 	database, err := db.Connect(db.ConfigDB{
 		Host:     cnf.Database.Host,
@@ -22,7 +25,6 @@ func NewServer() (*Server, error) {
 		Password: cnf.Database.Password,
 		Name:     cnf.Database.Name,
 	})
-
 	if err != nil {
 		return nil, err
 	}

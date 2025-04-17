@@ -41,7 +41,7 @@ func (r Repository) Create(category model.Category) error {
 	rsl := r.DB.Create(&category)
 
 	if rsl.Error != nil {
-		return db.HandleError(rsl.Error)
+		return rsl.Error
 	}
 
 	return nil

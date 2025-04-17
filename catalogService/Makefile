@@ -1,14 +1,14 @@
-GOOSE=goose
-MIGRATIONS_DIR=./migrations
-DB_DRIVER=postgres
+GOOSE_MIGRATION_DIR=/app/migrations
+GOOSE_DRIVER=postgres
+GOOSE_DBSTRING="postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable&search_path=$(DB_SCHEMA)"
 
 migrate:
-	GOOSE_DRIVER=$(DB_DRIVER) GOOSE_DBSTRING=postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable $(GOOSE) up $(MIGRATIONS_DIR)
+	GOOSE_DRIVER=$(GOOSE_DRIVER) GOOSE_DBSTRING=$(GOOSE_DBSTRING) GOOSE_MIGRATION_DIR=$(GOOSE_MIGRATION_DIR) goose up
 
 migrate_down:
-	GOOSE_DRIVER=$(DB_DRIVER) GOOSE_DBSTRING=postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable $(GOOSE) down $(MIGRATIONS_DIR)
+	GOOSE_DRIVER=$(GOOSE_DRIVER) GOOSE_DBSTRING=$(GOOSE_DBSTRING) GOOSE_MIGRATION_DIR=$(GOOSE_MIGRATION_DIR) goose down
 
 create_migration:
-	GOOSE_DRIVER=$(DB_DRIVER) GOOSE_DBSTRING=postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable $(GOOSE) create $(name) sql
+	GOOSE_DRIVER=$(GOOSE_DRIVER) GOOSE_DBSTRING=$(GOOSE_DBSTRING) GOOSE_MIGRATION_DIR=$(GOOSE_MIGRATION_DIR) goose create $(name) sql
 
 .PHONY: migrate migrate_down create_migration
