@@ -4,8 +4,8 @@ services:
       context: .
       dockerfile: catalogService/Dockerfile
     environment:
-      - CATALOG_SERVICE_PORT=${CATALOG_SERVICE_PORT}
-      - DB_HOST=${DATABASE_ADDRESS}
+      - PORT=:8080
+      - DB_HOST=${DB_ADDRESS}
       - DB_PORT=${DB_PORT}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
@@ -20,16 +20,15 @@ services:
       context: .
       dockerfile: backgroundWorkerService/Dockerfile
     environment:
-      - BACKGROUND_SERVICE_PORT=${BACKGROUND_SERVICE_PORT}
+      - PORT=:8080
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_DB=${REDIS_DB}
       - REDIS_TTL=${REDIS_TTL}
       - FIXER_TOKEN=${FIXER_TOKEN}
-      - DB_PORT=${DB_PORT}
     restart: unless-stopped
     ports:
-      - 8081:8081
+      - 8082:8080
 
   postgresql:
     image: docker.io/bitnami/postgresql:17

@@ -5,6 +5,7 @@ import (
 	"backgroundWorkerService/internal/usdRates/model"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"io"
@@ -77,4 +78,24 @@ func (s Service) GetUSDRates(ctx context.Context) (model.USDRatesResponse, error
 	}
 
 	return response, nil
+}
+
+func (s Service) GetUSDRatesCache(ctx context.Context, currency string) (float64, error) {
+	redisKey := fmt.Sprintf("%s%s", PREFIX_KEY, currency)
+	rsl := s.Redis.Get(ctx, redisKey)
+
+	if err := rsl.Err(); err != nil {
+		if errors.Is(err, redis.Nil) {
+			return 0, fmt.Errorf("value %s not found in Redis", redisKey)
+		} else {
+			return 0, err
+		}
+	}
+
+	valueFloat, err := rsl.Float64()
+	if err != nil {
+		return 0, fmt.Errorf("can`t parse %s to float64", rsl.Val())
+	}
+
+	return valueFloat, nil
 }
