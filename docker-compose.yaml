@@ -30,6 +30,24 @@ services:
     ports:
       - 8082:8080
 
+  orderservice:
+    build:
+      context: .
+      dockerfile: orderService/Dockerfile
+    environment:
+      - ORDER_SERVICE_PORT=${ORDER_SERVICE_PORT}
+      - DB_HOST=${DATABASE_ADDRESS}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_SCHEMA=orders
+      - CATALOG_SERVICE_ADDR=http://catalogservice:8080
+      - BACKGROUND_SERVICE_ADDR=http://backgroundworkerservice:8080
+    restart: unless-stopped
+    ports:
+      - 8081:8080
+
   postgresql:
     image: docker.io/bitnami/postgresql:17
     ports:
