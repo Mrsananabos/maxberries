@@ -28,7 +28,7 @@ func NewHandler(db *gorm.DB, cnf configs.Services) Handler {
 func (h Handler) GetAllOrders(c *gin.Context) {
 	orders, err := h.service.GetAll()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, orders)
