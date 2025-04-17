@@ -4,18 +4,10 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"orderService/configs"
 )
 
-type ConfigDB struct {
-	Host     string
-	Port     string
-	User     string
-	Password string
-	Name     string
-	Schema   string
-}
-
-func Connect(cnf ConfigDB) (*gorm.DB, error) {
+func Connect(cnf configs.Database) (*gorm.DB, error) {
 	dsn := fmt.Sprintf(
 		"postgresql://%s:%s@%s:%s/%s?sslmode=disable&search_path=%s",
 		cnf.User,

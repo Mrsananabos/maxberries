@@ -18,14 +18,7 @@ func NewServer() (*Server, error) {
 		return nil, err
 	}
 
-	database, err := db.Connect(db.ConfigDB{
-		Host:     cnf.Database.Host,
-		Port:     cnf.Database.Port,
-		User:     cnf.Database.User,
-		Password: cnf.Database.Password,
-		Name:     cnf.Database.Name,
-		Schema:   cnf.Database.Schema,
-	})
+	database, err := db.Connect(cnf.Database)
 	if err != nil {
 		return nil, err
 	}
