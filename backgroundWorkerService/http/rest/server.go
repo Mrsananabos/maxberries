@@ -13,7 +13,10 @@ type Server struct {
 }
 
 func NewServer() (*Server, error) {
-	cnf := configs.NewParsedConfig()
+	cnf, err := configs.NewParsedConfig()
+	if err != nil {
+		return nil, err
+	}
 
 	redis, err := db.Connect(cnf.Redis)
 	if err != nil {
