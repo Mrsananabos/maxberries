@@ -9,5 +9,5 @@ import (
 func Register(gin *gin.Engine, config configs.Config, redis *redis.Client) {
 	usdRatesHandler := NewHandler(config, redis)
 
-	gin.GET("/rates", usdRatesHandler.GetUsdRates)
+	gin.GET("/rates/:id", usdRatesHandler.GetUsdRates)
 }

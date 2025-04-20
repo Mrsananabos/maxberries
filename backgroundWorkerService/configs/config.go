@@ -1,51 +1,26 @@
 package configs
 
-import (
-	"fmt"
-	"os"
-	"strconv"
-)
+import "github.com/kelseyhightower/envconfig"
 
 type Config struct {
-	Port             string
+	Port             string `envconfig:"PORT" default:":8080"`
 	Redis            Redis
-	FixerAccessToken string
+	FixerAccessToken string `envconfig:"FIXER_TOKEN"`
 }
 
 type Redis struct {
-	Host string
-	Port string
-	DB   int
-	TTL  int
+	Host string `envconfig:"REDIS_HOST"`
+	Port string `envconfig:"REDIS_PORT"`
+	DB   int    `envconfig:"REDIS_DB"`
+	TTL  int    `envconfig:"REDIS_TTL"`
 }
 
-func NewParsedConfig() Config {
-	return Config{
-		Redis: Redis{
-			Host: getEnv("REDIS_HOST"),
-			Port: getEnv("REDIS_PORT"),
-			DB:   getIntEnv("REDIS_DB"),
-			TTL:  getIntEnv("REDIS_TTL"),
-		},
-		Port:             getEnv("BACKGROUND_SERVICE_PORT"),
-		FixerAccessToken: getEnv("FIXER_TOKEN"),
-	}
-}
-
-func getEnv(name string) string {
-	value, exist := os.LookupEnv(name)
-	if !exist {
-		panic(fmt.Sprintf("Not exist %s env", name))
-	}
-
-	return value
-}
-
-func getIntEnv(name string) int {
-	redisDB, err := strconv.Atoi(getEnv(name))
+func NewParsedConfig() (Config, error) {
+	var config Config
+	err := envconfig.Process("", &config)
 	if err != nil {
-		panic(fmt.Sprintf("%s is not integer", name))
+		return config, err
 	}
 
-	return redisDB
+	return config, nil
 }

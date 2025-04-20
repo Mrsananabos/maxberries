@@ -23,7 +23,10 @@ func main() {
 		cancel()
 	}()
 
-	config := configs.NewParsedConfig()
+	config, err := configs.NewParsedConfig()
+	if err != nil {
+		panic(err)
+	}
 
 	cron, err := cronTask.CronConfig{
 		CronExpression: "20 * * * *",
