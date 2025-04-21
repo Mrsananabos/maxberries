@@ -7,7 +7,7 @@ import (
 type Config struct {
 	Services   Services
 	Mongo      MongoDB
-	ServerPort string `envconfig:"PORT" default:":8084"`
+	ServerPort string `envconfig:"PORT" default:":8080"`
 }
 
 type MongoDB struct {

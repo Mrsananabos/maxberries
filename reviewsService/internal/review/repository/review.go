@@ -17,29 +17,6 @@ func NewRepository(mCollection *mongo.Collection) Repository {
 	return Repository{MCollection: mCollection}
 }
 
-func (r Repository) GetAll(ctx context.Context) ([]model.Review, error) {
-	var reviews []model.Review
-	cursor, err := r.MCollection.Find(ctx, bson.D{{}})
-	if err != nil {
-		return reviews, err
-	}
-	defer cursor.Close(ctx)
-
-	for cursor.Next(ctx) {
-		var review model.Review
-		if err = cursor.Decode(&review); err != nil {
-			return reviews, nil
-		}
-		reviews = append(reviews, review)
-	}
-
-	if err = cursor.Err(); err != nil {
-		return []model.Review{}, err
-	}
-
-	return reviews, nil
-}
-
 func (r Repository) GetByProductId(ctx context.Context, id string) ([]model.Review, error) {
 	reviews := []model.Review{}
 	filter := bson.D{{"product_id", id}}
