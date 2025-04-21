@@ -9,18 +9,24 @@ import (
 	"orderService/http/rest/client"
 	"orderService/internal/order/model"
 	"orderService/internal/order/repository"
-	"orderService/internal/order/service/order"
+	"orderService/internal/order/service"
+	orderStatusModel "orderService/internal/orderStatus/model"
+	orderStatusRepo "orderService/internal/orderStatus/repository"
+	orderStatus "orderService/internal/orderStatus/service"
 	"strconv"
 )
 
 type Handler struct {
-	service    order.Service
+	service    service.Service
 	httpClient client.HttpClient
 }
 
 func NewHandler(db *gorm.DB, cnf configs.Services) Handler {
 	return Handler{
-		service:    order.NewService(repository.NewRepository(db)),
+		service: service.NewService(
+			repository.NewRepository(db),
+			orderStatus.NewService(orderStatusRepo.NewRepository(db)),
+		),
 		httpClient: client.NewHttpClient(cnf),
 	}
 }
@@ -115,7 +121,7 @@ func (h Handler) UpdateOrderStatus(c *gin.Context) {
 		return
 	}
 
-	var updatedStatus model.UpdateStatusRequest
+	var updatedStatus orderStatusModel.EditOrderStatusRequest
 	if err = c.ShouldBindJSON(&updatedStatus); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

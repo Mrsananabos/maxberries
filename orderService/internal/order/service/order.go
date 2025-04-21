@@ -1,21 +1,24 @@
-package order
+package service
 
 import (
 	"github.com/shopspring/decimal"
-	"orderService/http/rest/client"
 	"orderService/internal/order/model"
 	"orderService/internal/order/repository"
 	orderItem "orderService/internal/orderItem/model"
+	orderStatus "orderService/internal/orderStatus/model"
+	orderStatusService "orderService/internal/orderStatus/service"
+	"strings"
 )
 
 type Service struct {
-	repo       repository.Repository
-	httpClient client.HttpClient
+	repo               repository.Repository
+	orderStatusService orderStatusService.Service
 }
 
-func NewService(r repository.Repository) Service {
+func NewService(r repository.Repository, orderStatusService orderStatusService.Service) Service {
 	return Service{
-		repo: r,
+		repo:               r,
+		orderStatusService: orderStatusService,
 	}
 }
 
@@ -30,17 +33,26 @@ func (s Service) GetById(id int64) (model.Order, error) {
 func (s Service) Create(order model.Order, usdRate float64) error {
 	totalPrice := generateTotalPrice(order.Items, usdRate)
 	order.SetTotalPrice(totalPrice)
-	order.SetStatus(model.CREATED)
+	statusCreated, err := s.orderStatusService.GetCreatedStatus()
+	if err != nil {
+		return err
+	}
 
+	order.SetStatus(statusCreated)
 	return s.repo.Create(order)
 }
 
-func (s Service) UpdateStatus(id int64, status model.UpdateStatusRequest) error {
+func (s Service) UpdateStatus(id int64, status orderStatus.EditOrderStatusRequest) error {
 	if err := status.Validate(); err != nil {
 		return err
 	}
 
-	return s.repo.UpdateStatus(id, status.Status)
+	newStatus, err := s.orderStatusService.GetByName(strings.ToUpper(status.Status))
+	if err != nil {
+		return err
+	}
+
+	return s.repo.UpdateStatus(id, newStatus)
 }
 
 func (s Service) Delete(id int64) error {

@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"orderService/internal/orderItem/model"
+	status "orderService/internal/orderStatus/model"
 	"strings"
 	"time"
 )
@@ -17,7 +18,8 @@ type Order struct {
 	TotalPrice    decimal.Decimal    `json:"total_price"`
 	DeliveryPrice float64            `json:"delivery_price"`
 	Currency      string             `json:"currency" valid:"required"`
-	Status        Status             `json:"status" validate:"oneof=CREATED SHIPPED DELIVERED"`
+	StatusID      int64              `json:"status_id"`
+	Status        status.OrderStatus `gorm:"foreignKey:StatusID;references:ID" json:"status"`
 	Items         []*model.OrderItem `gorm:"foreignKey:OrderId;constraint:OnDelete:CASCADE;" json:"items" valid:"required"`
 	CreatedAt     time.Time          `gorm:"column:created_at;autoCreateTime" json:"created_at"`
 }
@@ -26,7 +28,7 @@ func (o *Order) SetTotalPrice(price decimal.Decimal) {
 	o.TotalPrice = price
 }
 
-func (o *Order) SetStatus(status Status) {
+func (o *Order) SetStatus(status status.OrderStatus) {
 	o.Status = status
 }
 

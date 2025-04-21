@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"gorm.io/gorm"
 	"orderService/internal/order/model"
-	"strings"
+	status "orderService/internal/orderStatus/model"
 )
 
 type Repository struct {
@@ -17,7 +17,7 @@ func NewRepository(db *gorm.DB) Repository {
 
 func (r Repository) GetAll() ([]model.Order, error) {
 	var orders []model.Order
-	rsl := r.DB.Preload("Items").Find(&orders)
+	rsl := r.DB.Preload("Items").Preload("Status").Find(&orders)
 
 	if rsl.Error != nil {
 		return orders, rsl.Error
@@ -28,7 +28,7 @@ func (r Repository) GetAll() ([]model.Order, error) {
 
 func (r Repository) GetById(id int64) (model.Order, error) {
 	var order model.Order
-	rsl := r.DB.Preload("Items").Take(&order, id)
+	rsl := r.DB.Preload("Items").Preload("Status").Take(&order, id)
 
 	if rsl.Error != nil {
 		return order, fmt.Errorf("not found order with id = %d", id)
@@ -61,8 +61,8 @@ func (r Repository) Delete(id int64) error {
 	return nil
 }
 
-func (r Repository) UpdateStatus(id int64, status model.Status) (err error) {
-	rsl := r.DB.Model(&model.Order{}).Where("id = ?", id).Update("status", strings.ToUpper(string(status)))
+func (r Repository) UpdateStatus(id int64, status status.OrderStatus) (err error) {
+	rsl := r.DB.Model(&model.Order{}).Where("id = ?", id).Update("status_id", status.ID)
 
 	if rsl.Error != nil {
 		return rsl.Error
