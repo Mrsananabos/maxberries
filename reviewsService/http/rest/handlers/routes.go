@@ -1,25 +1,18 @@
 package handlers
 
 import (
-	"catalogService/http/rest/handlers/category"
-	product "catalogService/http/rest/handlers/product"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
+	"go.mongodb.org/mongo-driver/mongo"
+	"reviewsService/configs"
+	"reviewsService/http/rest/handlers/review"
 )
 
-func Register(gin *gin.Engine, db *gorm.DB) {
-	categoryHandler := category.NewHandler(db)
-	productHandler := product.NewHandler(db)
+func Register(gin *gin.Engine, mCollection *mongo.Collection, cnf configs.Services) {
+	reviewHandler := review.NewHandler(mCollection, cnf)
 
-	gin.GET("/categories", categoryHandler.GetAllCategories)
-	gin.GET("/categories/:id", categoryHandler.GetCategoryById)
-	gin.POST("/categories", categoryHandler.CreateCategory)
-	gin.PUT("/categories/:id", categoryHandler.UpdateCategory)
-	gin.DELETE("/categories/:id", categoryHandler.DeleteCategory)
-
-	gin.GET("/products", productHandler.GetAllProducts)
-	gin.GET("/products/:id", productHandler.GetProductById)
-	gin.POST("/products", productHandler.SaveProduct)
-	gin.PUT("/products/:id", productHandler.UpdateProduct)
-	gin.DELETE("/products/:id", productHandler.DeleteProduct)
+	gin.POST("/reviews/", reviewHandler.CreateReview)
+	gin.GET("/reviews/:id", reviewHandler.GetByProductId)
+	gin.PATCH("/reviews/:id", reviewHandler.UpdateReview)
+	gin.DELETE("/reviews/:id", reviewHandler.DeleteById)
+	gin.DELETE("/reviews/", reviewHandler.DeleteByProductId)
 }

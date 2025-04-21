@@ -1,10 +1,10 @@
 package rest
 
 import (
-	"catalogService/configs"
-	"catalogService/http/rest/handlers"
-	"catalogService/pkg/db"
 	"github.com/gin-gonic/gin"
+	"reviewsService/configs"
+	"reviewsService/http/rest/handlers"
+	"reviewsService/pkg/db/mongo"
 )
 
 type Server struct {
@@ -18,19 +18,13 @@ func NewServer() (*Server, error) {
 		return nil, err
 	}
 
-	database, err := db.Connect(db.ConfigDB{
-		Host:     cnf.Database.Host,
-		Port:     cnf.Database.Port,
-		User:     cnf.Database.User,
-		Password: cnf.Database.Password,
-		Name:     cnf.Database.Name,
-	})
+	database, err := mongo.ConnectToCollection(cnf.Mongo)
 	if err != nil {
 		return nil, err
 	}
 
 	engine := gin.Default()
-	handlers.Register(engine, database)
+	handlers.Register(engine, database, cnf.Services)
 
 	s := Server{
 		config: cnf,

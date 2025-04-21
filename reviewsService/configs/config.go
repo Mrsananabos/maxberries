@@ -5,13 +5,20 @@ import (
 )
 
 type Config struct {
-	Database   MongoDB
-	ServerPort string `envconfig:"PORT" default:":8082"`
+	Services   Services
+	Mongo      MongoDB
+	ServerPort string `envconfig:"PORT" default:":8084"`
 }
 
 type MongoDB struct {
-	Host string `envconfig:"DB_HOST" required:"true" default:"localhost"`
-	Port int    `envconfig:"DB_PORT" required:"true"`
+	Host       string `envconfig:"MONGO_HOST" required:"true" default:"localhost"`
+	Port       int    `envconfig:"MONGO_PORT" required:"true"`
+	Name       string `envconfig:"MONGO_NAME" required:"true"`
+	Collection string `envconfig:"MONGO_COLLECTION" required:"true"`
+}
+
+type Services struct {
+	CatalogServiceAddress string `envconfig:"CATALOG_SERVICE_ADDR"  required:"true" default:"http://localhost:8080"`
 }
 
 func NewParsedConfig() (Config, error) {

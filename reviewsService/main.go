@@ -1,24 +1,17 @@
 package main
 
 import (
-	"fmt"
-	"reviewsService/configs"
-	"reviewsService/internal/review/model"
-	"reviewsService/internal/review/repository"
-	"reviewsService/pkg/db/mongo"
+	"reviewsService/http/rest"
 )
 
 func main() {
-	c := configs.MongoDB{Port: 27017, Host: "localhost"}
-	mongoc, err := mongo.Connect(c)
+	server, err := rest.NewServer()
 	if err != nil {
-		fmt.Println(mongoc)
+		panic(err)
 	}
 
-	r := repository.NewRepository(mongoc)
-	mr := model.Review{ProductID: "14", UserID: "2", Rating: 5, Text: "superpuper"}
-	err = r.Create(mr)
+	err = server.Run()
 	if err != nil {
-		fmt.Println(mongoc)
+		panic(err)
 	}
 }
