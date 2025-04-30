@@ -38,10 +38,6 @@ func (o *Order) SetTotalItemsPrice(price decimal.Decimal) {
 	o.TotalItemsPrice = price
 }
 
-func (o *Order) SetItems(items []*model.OrderItem) {
-	o.Items = items
-}
-
 func (o *Order) SetStatus(status status.OrderStatus) {
 	o.Status = status
 }
