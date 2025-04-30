@@ -1,4 +1,4 @@
-package db
+package redisClient
 
 import (
 	"backgroundWorkerService/configs"

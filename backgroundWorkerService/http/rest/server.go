@@ -3,7 +3,7 @@ package rest
 import (
 	"backgroundWorkerService/configs"
 	"backgroundWorkerService/http/rest/handlers"
-	"backgroundWorkerService/pkg/db"
+	"backgroundWorkerService/internal/servicesStorage"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,19 +12,9 @@ type Server struct {
 	gin    *gin.Engine
 }
 
-func NewServer() (*Server, error) {
-	cnf, err := configs.NewParsedConfig()
-	if err != nil {
-		return nil, err
-	}
-
-	redis, err := db.Connect(cnf.Redis)
-	if err != nil {
-		return &Server{}, err
-	}
-
+func NewServer(cnf configs.Config, services servicesStorage.InternalServices) (*Server, error) {
 	engine := gin.Default()
-	handlers.Register(engine, cnf, redis)
+	handlers.Register(engine, services)
 
 	s := Server{
 		config: cnf,

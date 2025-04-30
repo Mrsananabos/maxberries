@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"gorm.io/gorm"
 	"orderService/internal/order/model"
-	status "orderService/internal/orderStatus/model"
 )
 
 type Repository struct {
@@ -37,14 +36,14 @@ func (r Repository) GetById(id int64) (model.Order, error) {
 	return order, nil
 }
 
-func (r Repository) Create(order model.Order) error {
+func (r Repository) Create(order model.Order) (model.Order, error) {
 	rsl := r.DB.Create(&order)
 
 	if rsl.Error != nil {
-		return rsl.Error
+		return model.Order{}, rsl.Error
 	}
 
-	return nil
+	return order, nil
 }
 
 func (r Repository) Delete(id int64) error {
@@ -61,16 +60,17 @@ func (r Repository) Delete(id int64) error {
 	return nil
 }
 
-func (r Repository) UpdateStatus(id int64, status status.OrderStatus) (err error) {
-	rsl := r.DB.Model(&model.Order{}).Where("id = ?", id).Update("status_id", status.ID)
+func (r Repository) Update(id int64, updatedFields map[string]interface{}) (model.Order, error) {
+	var updatedOrder model.Order
+	rsl := r.DB.Model(&updatedOrder).Where("id = ?", id).Updates(updatedFields).Scan(&updatedOrder)
 
 	if rsl.Error != nil {
-		return rsl.Error
+		return model.Order{}, rsl.Error
 	}
 
 	if rsl.RowsAffected != 1 {
-		return fmt.Errorf("not found order with id = %d", id)
+		return model.Order{}, fmt.Errorf("not found order with id = %d", id)
 	}
 
-	return
+	return updatedOrder, nil
 }

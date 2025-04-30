@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	BASE_URL   = "https://data.fixer.io/api/latest"
+	BASE_URL   = "http://data.fixer.io/api/latest"
 	PREFIX_KEY = "rates:USD_"
 )
 
@@ -80,7 +80,28 @@ func (s Service) GetUSDRates(ctx context.Context) (model.USDRatesResponse, error
 	return response, nil
 }
 
-func (s Service) GetUSDRatesCache(ctx context.Context, currency string) (float64, error) {
+func (s Service) GetUSDRate(ctx context.Context, currency string) (float64, error) {
+	usdRate, err := s.getUSDRateCache(ctx, currency)
+	if err != nil {
+		log.Println(err.Error())
+	} else {
+		return usdRate, err
+	}
+
+	usdRates, err := s.GetUSDRates(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	rate, ok := usdRates.Rates[currency]
+	if !ok {
+		return 0, fmt.Errorf("not found range for %s", currency)
+	}
+
+	return rate, nil
+}
+
+func (s Service) getUSDRateCache(ctx context.Context, currency string) (float64, error) {
 	redisKey := fmt.Sprintf("%s%s", PREFIX_KEY, currency)
 	rsl := s.Redis.Get(ctx, redisKey)
 
