@@ -39,7 +39,7 @@ func main() {
 	cron, err := cronTask.CronConfig{
 		CronExpression: "20 * * * *",
 		Config:         config,
-	}.CreateCronTask(ctx, services.InternalServices.USDRatesService)
+	}.CreateCronTask(ctx, services.USDRatesService)
 
 	if err != nil {
 		log.Fatalf("error creating cron task %v", err)
@@ -49,7 +49,7 @@ func main() {
 	log.Println("Cron Background Worker started")
 	defer cron.Stop()
 
-	server, err := rest.NewServer(config, services.InternalServices)
+	server, err := rest.NewServer(config, services)
 	if err != nil {
 		panic(err)
 	}
@@ -63,7 +63,7 @@ func main() {
 		log.Printf("Kafka failed subscribe topics: %s", err.Error())
 	}
 
-	eventHandler := eventHandle.NewHandler(kafkaConsumer, services.InternalServices.OrderPriceService)
+	eventHandler := eventHandle.NewHandler(kafkaConsumer, services.OrderPriceService)
 
 	go func() {
 		eventHandler.Start(ctx)

@@ -3,7 +3,7 @@ package rest
 import (
 	"backgroundWorkerService/configs"
 	"backgroundWorkerService/http/rest/handlers"
-	"backgroundWorkerService/internal/servicesStorage"
+	services "backgroundWorkerService/internal/servicesStorage"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,7 +12,7 @@ type Server struct {
 	gin    *gin.Engine
 }
 
-func NewServer(cnf configs.Config, services servicesStorage.InternalServices) (*Server, error) {
+func NewServer(cnf configs.Config, services services.ServicesStorage) (*Server, error) {
 	engine := gin.Default()
 	handlers.Register(engine, services)
 

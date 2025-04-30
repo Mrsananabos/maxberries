@@ -9,15 +9,9 @@ import (
 	usdRates "backgroundWorkerService/internal/usdRates/service"
 	db "backgroundWorkerService/pkg/db/gorm"
 	redisCl "backgroundWorkerService/pkg/db/redisClient"
-	"github.com/go-redis/redis/v8"
 )
 
 type ServicesStorage struct {
-	InternalServices InternalServices
-	RedisClient      *redis.Client
-}
-
-type InternalServices struct {
 	OrderPriceService     orderPrice.Service
 	USDRatesService       usdRates.Service
 	DeliveryTariffService deliveryTariff.Service
@@ -39,11 +33,8 @@ func NewServicesStorage(cnf configs.Config) (ServicesStorage, error) {
 	deliveryTariffService := deliveryTariff.NewService(deliveryTariffRepo.NewRepository(database))
 	usdRatesService := usdRates.NewService(cnf, redisClient)
 	return ServicesStorage{
-		InternalServices: InternalServices{
-			OrderPriceService:     orderPrice.NewService(deliveryTariffService, usdRatesService, httpClient.NewHttpClient(cnf.Services)),
-			USDRatesService:       usdRatesService,
-			DeliveryTariffService: deliveryTariffService,
-		},
-		RedisClient: redisClient,
+		OrderPriceService:     orderPrice.NewService(deliveryTariffService, usdRatesService, httpClient.NewHttpClient(cnf.Services)),
+		USDRatesService:       usdRatesService,
+		DeliveryTariffService: deliveryTariffService,
 	}, nil
 }

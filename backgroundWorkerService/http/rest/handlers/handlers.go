@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"backgroundWorkerService/internal/servicesStorage"
+	services "backgroundWorkerService/internal/servicesStorage"
 	"backgroundWorkerService/internal/usdRates/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -12,7 +12,7 @@ type Handler struct {
 	service service.Service
 }
 
-func NewHandler(services servicesStorage.InternalServices) Handler {
+func NewHandler(services services.ServicesStorage) Handler {
 	return Handler{
 		service: services.USDRatesService,
 	}
