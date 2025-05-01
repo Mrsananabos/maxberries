@@ -6,7 +6,6 @@ import (
 	"authService/internal/servicesStorage"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"net"
 	"net/http"
 )
 
@@ -43,9 +42,6 @@ func (h Handler) Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	ip, _, _ := net.SplitHostPort(c.Request.RemoteAddr)
-	loginForm.Ip = ip
 
 	tokens, err := h.service.Login(c, loginForm)
 	if err != nil {
