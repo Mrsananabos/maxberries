@@ -63,13 +63,13 @@ func (h Handler) Auth(c *gin.Context) {
 		return
 	}
 
-	permissions, err := h.service.Auth(authToken)
+	claims, err := h.service.Auth(authToken)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, permissions)
+	c.JSON(http.StatusOK, claims.Permissions)
 }
 
 func (h Handler) RefreshTokens(c *gin.Context) {

@@ -80,7 +80,6 @@ func (s Service) GenerateRefreshToken(ctx context.Context, userID uuid.UUID) (st
 
 	if err = s.redis.Set(ctx, tokenID, claimsJSON, s.refreshTokenTTL).Err(); err != nil {
 		log.Printf("Can`t add to redis key=%s, value=%s", tokenID, string(claimsJSON))
-		log.Printf(err.Error())
 	}
 
 	return signedToken, nil
