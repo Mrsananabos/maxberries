@@ -27,7 +27,7 @@ type OrderPriceInfo struct {
 	DeliveryPrice float64 `json:"delivery_price,omitempty"`
 }
 
-func (h HttpClient) UpdateOrder(id int64, orderInfo OrderPriceInfo) error {
+func (h HttpClient) UpdateOrderPriceInfo(id int64, orderInfo OrderPriceInfo) error {
 	body, err := json.Marshal(orderInfo)
 	if err != nil {
 		return fmt.Errorf("failed to marshal orderInfo to JSON: %w", err)

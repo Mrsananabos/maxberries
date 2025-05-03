@@ -57,5 +57,5 @@ func (s Service) UpdateTotalOrderPrice(ctx context.Context, msg message.OrderMes
 		}
 	}
 
-	return s.httpClient.UpdateOrder(msg.OrderID, editOrderInfo)
+	return s.httpClient.UpdateOrderPriceInfo(msg.OrderID, editOrderInfo)
 }

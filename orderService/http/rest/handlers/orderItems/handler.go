@@ -3,15 +3,13 @@ package order
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	orderStatusModel "orderService/internal/orderItem/model"
+	"orderService/internal/orderItem/model"
 	"orderService/internal/orderItem/service"
-	totalPriceOrder "orderService/internal/totalPriceOrder/service"
 	"strconv"
 )
 
 type Handler struct {
-	service         service.Service
-	totalPriceOrder totalPriceOrder.Service
+	service service.Service
 }
 
 func NewHandler(service service.Service) Handler {
@@ -28,7 +26,7 @@ func (h Handler) UpdateItems(c *gin.Context) {
 		return
 	}
 
-	var updatedItems orderStatusModel.EditOrderItemsRequest
+	var updatedItems model.EditOrderItemsRequest
 	if err = c.ShouldBindJSON(&updatedItems); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
