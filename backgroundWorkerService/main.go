@@ -3,7 +3,10 @@ package main
 import (
 	"backgroundWorkerService/configs"
 	"backgroundWorkerService/http/rest"
+	eventHandle "backgroundWorkerService/http/rest/eventHandler"
+	"backgroundWorkerService/internal/servicesStorage"
 	"backgroundWorkerService/internal/usdRates/cronTask"
+	"backgroundWorkerService/pkg/db/kafka"
 	"context"
 	"log"
 	"os"
@@ -28,10 +31,15 @@ func main() {
 		panic(err)
 	}
 
+	services, err := servicesStorage.NewServicesStorage(config)
+	if err != nil {
+		panic(err)
+	}
+
 	cron, err := cronTask.CronConfig{
 		CronExpression: "20 * * * *",
 		Config:         config,
-	}.CreateCronTask(ctx)
+	}.CreateCronTask(ctx, services.USDRatesService)
 
 	if err != nil {
 		log.Fatalf("error creating cron task %v", err)
@@ -41,10 +49,26 @@ func main() {
 	log.Println("Cron Background Worker started")
 	defer cron.Stop()
 
-	server, err := rest.NewServer()
+	server, err := rest.NewServer(config, services)
 	if err != nil {
 		panic(err)
 	}
+
+	kafkaConsumer, err := kafka.CreateConsumer(config.Kafka)
+	if err != nil {
+		log.Printf("Kafka consumer failed: %s", err.Error())
+	}
+
+	if err = kafkaConsumer.SubscribeTopics([]string{kafka.ORDER_EVENTS_TOPIC}); err != nil {
+		log.Printf("Kafka failed subscribe topics: %s", err.Error())
+	}
+
+	eventHandler := eventHandle.NewHandler(kafkaConsumer, services.OrderPriceService)
+
+	go func() {
+		eventHandler.Start(ctx)
+		log.Println("Kafka event handler is starting")
+	}()
 
 	go func() {
 		log.Println("Background Worker Service is starting")

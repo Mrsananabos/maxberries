@@ -1,13 +1,12 @@
 package handlers
 
 import (
-	"backgroundWorkerService/configs"
+	services "backgroundWorkerService/internal/servicesStorage"
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis/v8"
 )
 
-func Register(gin *gin.Engine, config configs.Config, redis *redis.Client) {
-	usdRatesHandler := NewHandler(config, redis)
+func Register(gin *gin.Engine, services services.ServicesStorage) {
+	usdRatesHandler := NewHandler(services)
 
 	gin.GET("/rates/:id", usdRatesHandler.GetUsdRates)
 }

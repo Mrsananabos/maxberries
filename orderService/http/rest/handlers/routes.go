@@ -2,17 +2,19 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
-	"orderService/configs"
 	"orderService/http/rest/handlers/order"
+	orderItems "orderService/http/rest/handlers/orderItems"
+	services "orderService/internal/servicesStorage"
 )
 
-func Register(gin *gin.Engine, db *gorm.DB, cnf configs.Services) {
-	orderHandler := order.NewHandler(db, cnf)
+func Register(gin *gin.Engine, services services.ServicesStorage) {
+	orderHandler := order.NewHandler(services.OrderService)
+	orderItemsHandler := orderItems.NewHandler(services.OrderItemsService)
 
 	gin.GET("/orders", orderHandler.GetAllOrders)
 	gin.GET("/orders/:id", orderHandler.GetOrderById)
 	gin.POST("/orders", orderHandler.CreateOrder)
-	gin.PATCH("/orders/:id", orderHandler.UpdateOrderStatus)
+	gin.PUT("/orders/:id/items", orderItemsHandler.UpdateItems)
+	gin.PATCH("/orders/:id", orderHandler.UpdateOrder)
 	gin.DELETE("/orders/:id", orderHandler.DeleteOrder)
 }

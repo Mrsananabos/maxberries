@@ -3,31 +3,19 @@ package order
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"net/http"
-	"orderService/configs"
-	"orderService/http/rest/client"
 	"orderService/internal/order/model"
-	"orderService/internal/order/repository"
 	"orderService/internal/order/service"
-	orderStatusModel "orderService/internal/orderStatus/model"
-	orderStatusRepo "orderService/internal/orderStatus/repository"
-	orderStatus "orderService/internal/orderStatus/service"
 	"strconv"
 )
 
 type Handler struct {
-	service    service.Service
-	httpClient client.HttpClient
+	service service.Service
 }
 
-func NewHandler(db *gorm.DB, cnf configs.Services) Handler {
+func NewHandler(service service.Service) Handler {
 	return Handler{
-		service: service.NewService(
-			repository.NewRepository(db),
-			orderStatus.NewService(orderStatusRepo.NewRepository(db)),
-		),
-		httpClient: client.NewHttpClient(cnf),
+		service: service,
 	}
 }
 
@@ -70,30 +58,36 @@ func (h Handler) CreateOrder(c *gin.Context) {
 		return
 	}
 
-	for _, item := range orderRequest.Items {
-		price, err := h.httpClient.GetProductPrice(item.ProductId)
-
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("error getting price for product id = %d", item.ProductId)})
-			return
-		}
-
-		item.SetPrice(price)
-	}
-
-	usdRate, err := h.httpClient.GetUsdRate(orderRequest.Currency)
+	createdOrder, err := h.service.Create(orderRequest)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = h.service.Create(orderRequest, usdRate)
+	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Order %d created successfully", createdOrder.ID)})
+}
+
+func (h Handler) UpdateOrder(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	var updatedForm model.EditOrderRequest
+	if err = c.ShouldBindJSON(&updatedForm); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	updatedOrder, err := h.service.UpdateOrder(id, updatedForm)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Order created successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Order %d updated successfully", updatedOrder.ID)})
 }
 
 func (h Handler) DeleteOrder(c *gin.Context) {
@@ -111,27 +105,4 @@ func (h Handler) DeleteOrder(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Order deleted successfully"})
-}
-
-func (h Handler) UpdateOrderStatus(c *gin.Context) {
-	idStr := c.Param("id")
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
-		return
-	}
-
-	var updatedStatus orderStatusModel.EditOrderStatusRequest
-	if err = c.ShouldBindJSON(&updatedStatus); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	err = h.service.UpdateStatus(id, updatedStatus)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Order status updated successfully"})
 }

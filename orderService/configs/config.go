@@ -7,6 +7,7 @@ import (
 type Config struct {
 	Services   Services
 	Database   Database
+	Kafka      Kafka
 	ServerPort string `envconfig:"PORT" default:":8080"`
 }
 
@@ -16,12 +17,17 @@ type Services struct {
 }
 
 type Database struct {
-	Host     string `envconfig:"DB_HOST" default:":localhost"`
+	Host     string `envconfig:"DB_HOST" default:"localhost"`
 	Port     string `envconfig:"DB_PORT" required:"true"`
 	User     string `envconfig:"DB_USER" required:"true"`
 	Password string `envconfig:"DB_PASSWORD" required:"true"`
 	Name     string `envconfig:"DB_NAME" required:"true"`
-	Schema   string `envconfig:"DB_SCHEMA" required:"true"`
+	Schema   string `envconfig:"DB_SCHEMA" required:"true" default:"orders"`
+}
+
+type Kafka struct {
+	Host string `envconfig:"KAFKA_HOST" required:"true"`
+	Port string `envconfig:"KAFKA_PORT" required:"true"`
 }
 
 func NewParsedConfig() (Config, error) {
