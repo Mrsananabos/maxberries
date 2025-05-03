@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	auth "authService/http/rest/handlers/auth"
+	"authService/http/rest/handlers/auth"
 	"authService/http/rest/handlers/permission"
 	"authService/http/rest/handlers/role"
 	"authService/http/rest/handlers/user"

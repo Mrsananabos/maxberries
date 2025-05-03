@@ -1,4 +1,4 @@
-package category
+package auth
 
 import (
 	"authService/internal/auth/model"
@@ -21,7 +21,6 @@ func NewHandler(services servicesStorage.ServicesStorage) Handler {
 
 func (h Handler) Register(c *gin.Context) {
 	var regForm model.Register
-
 	if err := c.ShouldBindJSON(&regForm); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
