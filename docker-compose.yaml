@@ -63,6 +63,28 @@ services:
     ports:
       - 8083:8080
 
+  authervice:
+    build:
+      context: .
+      dockerfile: authService/Dockerfile
+    environment:
+      - PORT=:8080
+      - DB_HOST=${DB_ADDRESS}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_SCHEMA=auth
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_DB=1
+      - JWT_SECRET=superSecretText
+      - ACCESS_TOKEN_TTL=180
+      - REFRESH_TOKEN_TTL=720
+    restart: unless-stopped
+    ports:
+      - 8084:8080
+
   postgresql:
     image: docker.io/bitnami/postgresql:17
     ports:
