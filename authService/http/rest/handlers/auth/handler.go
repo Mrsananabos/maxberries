@@ -64,7 +64,7 @@ func (h Handler) Auth(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, claims.Permissions)
+	c.JSON(http.StatusOK, claims)
 }
 
 func (h Handler) RefreshTokens(c *gin.Context) {

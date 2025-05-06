@@ -14,7 +14,7 @@ const TEXT_MIN_LEN = 15
 
 type Review struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty"`
-	ProductID string             `bson:"product_id" json:"product_id" valid:"required"`
+	ProductID int64              `bson:"product_id" json:"product_id" valid:"required"`
 	UserID    string             `bson:"user_id" json:"user_id" valid:"required"`
 	Rating    *int               `bson:"rating" json:"rating"`
 	Text      string             `bson:"text" json:"text" valid:"required"`

@@ -4,7 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"reviewsService/configs"
 	"reviewsService/http/rest/handlers"
+	"reviewsService/internal/servicesStorage"
 	"reviewsService/pkg/db/mongo"
+	"reviewsService/pkg/kafka"
 )
 
 type Server struct {
@@ -23,8 +25,15 @@ func NewServer() (*Server, error) {
 		return nil, err
 	}
 
+	kafkaProducer, err := kafka.CreateProducer(cnf.Kafka)
+	if err != nil {
+		return nil, err
+	}
+
+	services := servicesStorage.NewServicesStorage(cnf, database)
+
 	engine := gin.Default()
-	handlers.Register(engine, database, cnf.Services)
+	handlers.Register(engine, services, kafkaProducer)
 
 	s := Server{
 		config: cnf,

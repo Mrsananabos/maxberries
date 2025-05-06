@@ -2,17 +2,20 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/mongo"
-	"reviewsService/configs"
 	"reviewsService/http/rest/handlers/review"
+	"reviewsService/http/rest/middleware"
+	"reviewsService/internal/servicesStorage"
+	"reviewsService/pkg/kafka"
 )
 
-func Register(gin *gin.Engine, mCollection *mongo.Collection, cnf configs.Services) {
-	reviewHandler := review.NewHandler(mCollection, cnf)
+func Register(gin *gin.Engine, services servicesStorage.ServicesStorage, kafkaProducer kafka.Producer) {
+	reviewHandler := review.NewHandler(kafkaProducer, services)
+	m := middleware.CreateJWTMiddleware(services)
 
-	gin.POST("/reviews/", reviewHandler.CreateReview)
+	gin.POST("/reviews/", m.PermissionCheckMiddleware("review.create"), reviewHandler.CreateReview)
 	gin.GET("/reviews/:id", reviewHandler.GetByProductId)
-	gin.PATCH("/reviews/:id", reviewHandler.UpdateReview)
-	gin.DELETE("/reviews/:id", reviewHandler.DeleteById)
-	gin.DELETE("/reviews/", reviewHandler.DeleteByProductId)
+	gin.GET("/reviews/all", reviewHandler.GetAll)
+	gin.PATCH("/reviews/:id", m.UserPermissionCheckMiddleware("review.update"), reviewHandler.UpdateReview)
+	gin.DELETE("/reviews/:id", m.UserPermissionCheckMiddleware("review.deleteReview"), reviewHandler.DeleteById)
+	gin.DELETE("/reviews/", m.PermissionCheckMiddleware("review.deleteProductReviews"), reviewHandler.DeleteByProductId)
 }

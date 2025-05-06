@@ -1,11 +1,11 @@
-FROM golang:1.24.0-alpine3.21 AS builder
+FROM golang:1.24.2-bookworm AS builder
     WORKDIR /app
 
     COPY ./reviewsService/ ./
 
     RUN go build -o reviewsService .
 
-FROM alpine:3.21.3
+FROM debian:bookworm
 
     WORKDIR /app
 
