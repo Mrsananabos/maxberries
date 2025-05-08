@@ -3,23 +3,25 @@ package handlers
 import (
 	"catalogService/http/rest/handlers/category"
 	product "catalogService/http/rest/handlers/product"
+	"catalogService/http/rest/middleware"
+	"catalogService/internal/servicesStorage"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
-func Register(gin *gin.Engine, db *gorm.DB) {
-	categoryHandler := category.NewHandler(db)
-	productHandler := product.NewHandler(db)
+func Register(gin *gin.Engine, services servicesStorage.ServicesStorage) {
+	categoryHandler := category.NewHandler(services)
+	productHandler := product.NewHandler(services)
+	m := middleware.CreateJWTMiddleware(services)
 
 	gin.GET("/categories", categoryHandler.GetAllCategories)
 	gin.GET("/categories/:id", categoryHandler.GetCategoryById)
-	gin.POST("/categories", categoryHandler.CreateCategory)
-	gin.PUT("/categories/:id", categoryHandler.UpdateCategory)
-	gin.DELETE("/categories/:id", categoryHandler.DeleteCategory)
+	gin.POST("/categories", m.PermissionCheckMiddleware("category.create"), categoryHandler.CreateCategory)
+	gin.PUT("/categories/:id", m.PermissionCheckMiddleware("category.edit"), categoryHandler.UpdateCategory)
+	gin.DELETE("/categories/:id", m.PermissionCheckMiddleware("category.delete"), categoryHandler.DeleteCategory)
 
 	gin.GET("/products", productHandler.GetAllProducts)
 	gin.GET("/products/:id", productHandler.GetProductById)
-	gin.POST("/products", productHandler.SaveProduct)
-	gin.PUT("/products/:id", productHandler.UpdateProduct)
-	gin.DELETE("/products/:id", productHandler.DeleteProduct)
+	gin.POST("/products", m.PermissionCheckMiddleware("product.create"), productHandler.SaveProduct)
+	gin.PUT("/products/:id", m.PermissionCheckMiddleware("product.edit"), productHandler.UpdateProduct)
+	gin.DELETE("/products/:id", m.PermissionCheckMiddleware("product.delete"), productHandler.DeleteProduct)
 }

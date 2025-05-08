@@ -33,7 +33,8 @@ type Kafka struct {
 }
 
 type Services struct {
-	OrderServiceAddress string `envconfig:"ORDER_SERVICE_ADDR" default:"http://localhost:8081"`
+	OrderServiceAddress   string `envconfig:"ORDER_SERVICE_ADDR" default:"http://localhost:8081"`
+	OrderServiceAuthToken string `envconfig:"ORDER_SERVICE_AUTH_TOKEN"  required:"true"`
 }
 
 func NewParsedConfig() (Config, error) {

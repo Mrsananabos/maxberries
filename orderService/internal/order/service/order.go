@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 	"log"
-	"orderService/http/rest/client"
+	"orderService/http/rest/client/product"
 	"orderService/internal/order/model"
 	"orderService/internal/order/repository"
 	orderStatusServ "orderService/internal/orderStatus/service"
@@ -17,11 +17,11 @@ type Service struct {
 	repo                   repository.Repository
 	orderStatusService     orderStatusServ.Service
 	totalPriceOrderService totalPriceOrderServ.Service
-	httpClient             client.HttpClient
+	httpClient             product.HttpClient
 	kafkaProducer          kafka.Producer
 }
 
-func NewService(r repository.Repository, httpClient client.HttpClient, orderStatusServ orderStatusServ.Service,
+func NewService(r repository.Repository, httpClient product.HttpClient, orderStatusServ orderStatusServ.Service,
 	totalPriceOrderService totalPriceOrderServ.Service, kafka kafka.Producer) Service {
 	return Service{
 		repo:                   r,

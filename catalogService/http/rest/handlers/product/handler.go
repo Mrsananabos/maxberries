@@ -1,13 +1,10 @@
 package category
 
 import (
-	categoryRepo "catalogService/internal/category/repository"
-	category "catalogService/internal/category/service"
 	"catalogService/internal/product/model"
-	productRepo "catalogService/internal/product/repository"
 	product "catalogService/internal/product/service"
+	"catalogService/internal/servicesStorage"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 )
@@ -16,10 +13,9 @@ type Handler struct {
 	service product.Service
 }
 
-func NewHandler(db *gorm.DB) Handler {
+func NewHandler(services servicesStorage.ServicesStorage) Handler {
 	return Handler{
-		service: product.NewService(productRepo.NewRepository(db),
-			category.NewService(categoryRepo.NewRepository(db))),
+		service: services.ProductService,
 	}
 }
 
