@@ -79,7 +79,7 @@ func (s Service) Login(context context.Context, loginForm model.Login) (tokens j
 		return
 	}
 
-	accessToken, err := s.JWTService.GenerateAccessToken(foundUser.ID, codes)
+	accessToken, err := s.JWTService.GenerateAccessToken(foundUser.ID, foundUser.Role.Name, codes)
 	if err != nil {
 		return
 	}

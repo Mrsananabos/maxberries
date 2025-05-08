@@ -11,6 +11,7 @@ type Tokens struct {
 }
 
 type Claims struct {
+	Role        string   `json:"role"`
 	Permissions []string `json:"permissions"`
 	jwt.RegisteredClaims
 }
