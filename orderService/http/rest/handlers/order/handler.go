@@ -3,6 +3,7 @@ package order
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"net/http"
 	"orderService/internal/order/model"
 	"orderService/internal/order/service"
@@ -52,6 +53,14 @@ func (h Handler) CreateOrder(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	userUUID, err := uuid.Parse(c.Request.Header.Get("userId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	orderRequest.UserId = userUUID
 
 	if err := orderRequest.Validate(); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

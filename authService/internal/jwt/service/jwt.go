@@ -36,12 +36,13 @@ func NewService(cnf configs.JWTConfig, userService user.Service, roleService rol
 	}
 }
 
-func (s Service) GenerateAccessToken(userID uuid.UUID, permissions []string) (string, error) {
+func (s Service) GenerateAccessToken(userID uuid.UUID, role string, permissions []string) (string, error) {
 	tokenID := s.generateTokenUUID(userID, "refresh")
 	claims := jwt.MapClaims{
 		"type":        "access",
 		"jti":         tokenID,
 		"sub":         userID.String(),
+		"role":        role,
 		"permissions": permissions,
 		"ip":          22,
 		"device_info": "iphone_13",
@@ -137,7 +138,7 @@ func (s Service) RefreshTokens(ctx context.Context, refreshToken string) (tokens
 		return
 	}
 
-	newAccessToken, err := s.GenerateAccessToken(userID, permissions)
+	newAccessToken, err := s.GenerateAccessToken(userID, foundUser.Role.Name, permissions)
 	if err != nil {
 		return
 	}

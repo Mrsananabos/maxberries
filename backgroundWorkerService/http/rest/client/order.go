@@ -12,12 +12,14 @@ import (
 type HttpClient struct {
 	Cnf        configs.Services
 	HttpClient *http.Client
+	authToken  string
 }
 
 func NewHttpClient(cnf configs.Services) HttpClient {
 	return HttpClient{
 		Cnf:        cnf,
 		HttpClient: http.DefaultClient,
+		authToken:  cnf.OrderServiceAuthToken,
 	}
 }
 
@@ -38,6 +40,8 @@ func (h HttpClient) UpdateOrderPriceInfo(id int64, orderInfo OrderPriceInfo) err
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
+
+	req.Header.Set("Authorization", h.authToken)
 
 	resp, err := h.HttpClient.Do(req)
 	if err != nil {

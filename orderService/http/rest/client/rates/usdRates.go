@@ -1,10 +1,21 @@
-package client
+package rates
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"orderService/configs"
 )
+
+type HttpClient struct {
+	cnf configs.Services
+}
+
+func NewHttpClient(cnf configs.Services) HttpClient {
+	return HttpClient{
+		cnf: cnf,
+	}
+}
 
 type USDRatesResponse struct {
 	Rate float64

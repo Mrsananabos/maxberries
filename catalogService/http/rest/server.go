@@ -3,6 +3,7 @@ package rest
 import (
 	"catalogService/configs"
 	"catalogService/http/rest/handlers"
+	"catalogService/internal/servicesStorage"
 	"catalogService/pkg/db"
 	"github.com/gin-gonic/gin"
 )
@@ -24,8 +25,13 @@ func NewServer() (*Server, error) {
 		return nil, err
 	}
 
+	services, err := servicesStorage.NewServicesStorage(cnf, database)
+	if err != nil {
+		return nil, err
+	}
+
 	engine := gin.Default()
-	handlers.Register(engine, database)
+	handlers.Register(engine, services)
 
 	s := Server{
 		config: cnf,

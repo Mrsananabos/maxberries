@@ -14,6 +14,7 @@ type Config struct {
 type Services struct {
 	CatalogServiceAddress    string `envconfig:"CATALOG_SERVICE_ADDR" default:"http://localhost:8080"`
 	BackgroundServiceAddress string `envconfig:"BACKGROUND_SERVICE_ADDR" default:"http://localhost:8082"`
+	AuthServiceAddress       string `envconfig:"AUTH_SERVICE_ADDR" default:"http://localhost:8084"`
 }
 
 type Database struct {

@@ -3,22 +3,22 @@ package service
 import (
 	"fmt"
 	"github.com/shopspring/decimal"
-	"orderService/http/rest/client"
+	"orderService/http/rest/client/rates"
 	"orderService/internal/orderItem/model"
 )
 
 type Service struct {
-	httpClient client.HttpClient
+	usdRateHttpClient rates.HttpClient
 }
 
-func NewService(httpClient client.HttpClient) Service {
+func NewService(httpClient rates.HttpClient) Service {
 	return Service{
-		httpClient: httpClient,
+		usdRateHttpClient: httpClient,
 	}
 }
 
 func (s Service) GenerateTotalItemsPrice(items []*model.OrderItem, currency string) (decimal.Decimal, error) {
-	usdRate, err := s.httpClient.GetUsdRate(currency)
+	usdRate, err := s.usdRateHttpClient.GetUsdRate(currency)
 	if err != nil {
 		return decimal.Zero, fmt.Errorf("failed get rate for %s: %w", currency, err)
 	}
