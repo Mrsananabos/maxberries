@@ -7,6 +7,7 @@ import (
 type Config struct {
 	Services   Services
 	Mongo      MongoDB
+	Kafka      Kafka
 	ServerPort string `envconfig:"PORT" default:":8080"`
 }
 
@@ -19,6 +20,12 @@ type MongoDB struct {
 
 type Services struct {
 	CatalogServiceAddress string `envconfig:"CATALOG_SERVICE_ADDR"  required:"true" default:"http://localhost:8080"`
+	AuthServiceAddress    string `envconfig:"AUTH_SERVICE_ADDR"  required:"true" default:"http://localhost:8084"`
+}
+
+type Kafka struct {
+	Host string `envconfig:"KAFKA_HOST" required:"true"`
+	Port string `envconfig:"KAFKA_PORT" required:"true"`
 }
 
 func NewParsedConfig() (Config, error) {

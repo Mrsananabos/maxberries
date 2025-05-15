@@ -77,6 +77,9 @@ services:
       - MONGO_NAME=reviews
       - MONGO_COLLECTION=reviews
       - CATALOG_SERVICE_ADDR=http://catalogservice:8080
+      - AUTH_SERVICE_ADDR=http://authervice:8080
+      - KAFKA_HOST=kafka
+      - KAFKA_PORT=:9092
     restart: unless-stopped
     ports:
       - 8083:8080

@@ -4,29 +4,38 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
+	"log"
 	"net/http"
-	"reviewsService/configs"
-	"reviewsService/http/rest/client"
+	"reviewsService/http/rest/client/product"
 	"reviewsService/internal/review/model"
-	"reviewsService/internal/review/repository"
 	review "reviewsService/internal/review/service"
+	"reviewsService/internal/servicesStorage"
+	"reviewsService/pkg/kafka"
+	"reviewsService/pkg/kafka/message"
+	"strconv"
 )
 
 type Handler struct {
-	service    review.Service
-	httpClient client.HttpClient
+	service       review.Service
+	httpClient    product.HttpClient
+	kafkaProducer kafka.Producer
 }
 
-func NewHandler(mCollection *mongo.Collection, cnf configs.Services) Handler {
+func NewHandler(kafkaProducer kafka.Producer, services servicesStorage.ServicesStorage) Handler {
 	return Handler{
-		service:    review.NewService(repository.NewRepository(mCollection)),
-		httpClient: client.NewHttpClient(cnf),
+		service:       services.ReviewService,
+		httpClient:    services.ProductHttpClient,
+		kafkaProducer: kafkaProducer,
 	}
 }
 
 func (h Handler) GetByProductId(c *gin.Context) {
-	productId := c.Param("id")
+	productIdStr := c.Param("id")
+	productId, err := strconv.ParseInt(productIdStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	reviews, err := h.service.GetByProductId(c, productId)
 	if err != nil {
@@ -45,28 +54,43 @@ func (h Handler) CreateReview(c *gin.Context) {
 		return
 	}
 
+	reviewRequest.UserID = c.Request.Header.Get("userId")
+
 	if err := reviewRequest.Validate(); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	if err := h.httpClient.GetProductById(reviewRequest.ProductID); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Not found product with id = %s", reviewRequest.ProductID)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Not found product with id = %d", reviewRequest.ProductID)})
 		return
 	}
 
-	err := h.service.Create(c, reviewRequest)
+	createdReview, err := h.service.Create(c, reviewRequest)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	kafkaMsg := message.ReviewCreatedMsg{Event: message.REVIEW_CREATED_EVENT, ID: createdReview.ID, ProductID: createdReview.ProductID,
+		UserID: createdReview.UserID, Rating: createdReview.Rating, Text: createdReview.Text}
+	_, err = h.kafkaProducer.SentMsg(kafka.REVIEW_EVENTS_TOPIC, kafkaMsg)
+	if err != nil {
+		log.Printf("kafka: failed send order created msg %s", err.Error())
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Review created successfully"})
 }
 
 func (h Handler) DeleteByProductId(c *gin.Context) {
-	productID := c.Query("product_id")
-	err := h.service.DeleteByProductId(c, productID)
+	productIdStr := c.Query("product_id")
+	productId, err := strconv.ParseInt(productIdStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = h.service.DeleteByProductId(c, productId)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

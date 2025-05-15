@@ -17,7 +17,7 @@ func NewRepository(mCollection *mongo.Collection) Repository {
 	return Repository{MCollection: mCollection}
 }
 
-func (r Repository) GetByProductId(ctx context.Context, id string) ([]model.Review, error) {
+func (r Repository) GetByProductId(ctx context.Context, id int64) ([]model.Review, error) {
 	reviews := []model.Review{}
 	filter := bson.D{{"product_id", id}}
 	cursor, err := r.MCollection.Find(ctx, filter)
@@ -41,14 +41,44 @@ func (r Repository) GetByProductId(ctx context.Context, id string) ([]model.Revi
 	return reviews, nil
 }
 
-func (r Repository) Create(ctx context.Context, review model.Review) error {
-	bsonReview, err := bson.Marshal(review)
+func (r Repository) GetByUserId(ctx context.Context, userId string) ([]model.Review, error) {
+	reviews := []model.Review{}
+	filter := bson.D{{"user_id", userId}}
+	cursor, err := r.MCollection.Find(ctx, filter)
 	if err != nil {
-		return fmt.Errorf("error marshal review to bson %w", err)
+		return reviews, err
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var review model.Review
+		if err = cursor.Decode(&review); err != nil {
+			return reviews, err
+		}
+		reviews = append(reviews, review)
 	}
 
-	_, err = r.MCollection.InsertOne(ctx, bsonReview)
-	return err
+	if err = cursor.Err(); err != nil {
+		return reviews, err
+	}
+
+	return reviews, nil
+}
+
+func (r Repository) Create(ctx context.Context, review model.Review) (model.Review, error) {
+	bsonReview, err := bson.Marshal(review)
+	if err != nil {
+		return model.Review{}, fmt.Errorf("error marshal review to bson: %w", err)
+	}
+
+	insertResult, err := r.MCollection.InsertOne(ctx, bsonReview)
+	if err != nil {
+		return model.Review{}, fmt.Errorf("error inserting review into database: %w", err)
+	}
+
+	review.ID = insertResult.InsertedID.(primitive.ObjectID)
+
+	return review, nil
 }
 
 func (r Repository) DeleteById(ctx context.Context, id primitive.ObjectID) error {
@@ -65,7 +95,7 @@ func (r Repository) DeleteById(ctx context.Context, id primitive.ObjectID) error
 	return nil
 }
 
-func (r Repository) DeleteByProductId(ctx context.Context, id string) error {
+func (r Repository) DeleteByProductId(ctx context.Context, id int64) error {
 	filter := bson.D{{"product_id", id}}
 	deleteResult, err := r.MCollection.DeleteMany(ctx, filter)
 	if err != nil {
@@ -90,7 +120,7 @@ func (r Repository) Update(ctx context.Context, id primitive.ObjectID, review mo
 	}
 
 	if updateResult.MatchedCount != 1 {
-		return fmt.Errorf("not fount review for update with id = %d", id)
+		return fmt.Errorf("not fount review for update with id = %s", id.Hex())
 	}
 
 	return nil

@@ -17,12 +17,17 @@ func NewService(r repository.Repository) Service {
 	}
 }
 
-func (s Service) GetByProductId(ctx context.Context, id string) ([]model.Review, error) {
+func (s Service) GetByProductId(ctx context.Context, id int64) ([]model.Review, error) {
 	reviews, err := s.repo.GetByProductId(ctx, id)
 	return reviews, err
 }
 
-func (s Service) Create(ctx context.Context, review model.Review) error {
+func (s Service) GetByUserId(ctx context.Context, id string) ([]model.Review, error) {
+	reviews, err := s.repo.GetByUserId(ctx, id)
+	return reviews, err
+}
+
+func (s Service) Create(ctx context.Context, review model.Review) (model.Review, error) {
 	return s.repo.Create(ctx, review)
 }
 
@@ -34,7 +39,7 @@ func (s Service) Update(ctx context.Context, id primitive.ObjectID, review model
 	return s.repo.Update(ctx, id, review)
 }
 
-func (s Service) DeleteByProductId(ctx context.Context, id string) error {
+func (s Service) DeleteByProductId(ctx context.Context, id int64) error {
 	return s.repo.DeleteByProductId(ctx, id)
 }
 

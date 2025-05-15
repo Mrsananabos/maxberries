@@ -1,4 +1,4 @@
-package client
+package product
 
 import (
 	"fmt"
@@ -16,8 +16,8 @@ func NewHttpClient(cnf configs.Services) HttpClient {
 	}
 }
 
-func (h HttpClient) GetProductById(id string) error {
-	resp, err := http.Get(fmt.Sprintf("%s/products/%s", h.cnf.CatalogServiceAddress, id))
+func (h HttpClient) GetProductById(id int64) error {
+	resp, err := http.Get(fmt.Sprintf("%s/products/%d", h.cnf.CatalogServiceAddress, id))
 	if err != nil {
 		return fmt.Errorf("error while making request: %w", err)
 	}
@@ -27,4 +27,5 @@ func (h HttpClient) GetProductById(id string) error {
 	}
 
 	return nil
+
 }
