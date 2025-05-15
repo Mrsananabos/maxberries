@@ -15,7 +15,7 @@ func Register(gin *gin.Engine, services servicesStorage.ServicesStorage, kafkaPr
 	gin.POST("/reviews/", m.PermissionCheckMiddleware("review.create"), reviewHandler.CreateReview)
 	gin.GET("/reviews/:id", reviewHandler.GetByProductId)
 	gin.GET("/reviews/all", reviewHandler.GetAll)
-	gin.PATCH("/reviews/:id", m.UserPermissionCheckMiddleware("review.update"), reviewHandler.UpdateReview)
-	gin.DELETE("/reviews/:id", m.UserPermissionCheckMiddleware("review.deleteReview"), reviewHandler.DeleteById)
+	gin.PATCH("/reviews/:id", m.UserPermissionCheckMiddleware("review.updateAny", "review.update"), reviewHandler.UpdateReview)
+	gin.DELETE("/reviews/:id", m.UserPermissionCheckMiddleware("review.deleteAny", "review.delete"), reviewHandler.DeleteById)
 	gin.DELETE("/reviews/", m.PermissionCheckMiddleware("review.deleteProductReviews"), reviewHandler.DeleteByProductId)
 }

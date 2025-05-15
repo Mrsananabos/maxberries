@@ -22,7 +22,7 @@ func CreateJWTMiddleware(services servicesStorage.ServicesStorage) Middleware {
 	}
 }
 
-func (m Middleware) PermissionCheckMiddleware(requiredPermission string) gin.HandlerFunc {
+func (m Middleware) PermissionCheckMiddleware(reqPermission string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authToken := c.GetHeader("Authorization")
 		if authToken == "" {
@@ -38,7 +38,7 @@ func (m Middleware) PermissionCheckMiddleware(requiredPermission string) gin.Han
 			return
 		}
 
-		if hasPermission := slices.Contains(claims.Permissions, requiredPermission); hasPermission {
+		if hasPermission := slices.Contains(claims.Permissions, reqPermission); hasPermission {
 			c.Request.Header.Set("userId", claims.Sub)
 			c.Next()
 			return
@@ -49,7 +49,7 @@ func (m Middleware) PermissionCheckMiddleware(requiredPermission string) gin.Han
 	}
 }
 
-func (m Middleware) UserPermissionCheckMiddleware(fullPermission string, userPermission string) gin.HandlerFunc {
+func (m Middleware) UserPermissionCheckMiddleware(fullReqPermission string, userReqPermission string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authToken := c.GetHeader("Authorization")
 		if authToken == "" {
@@ -65,13 +65,13 @@ func (m Middleware) UserPermissionCheckMiddleware(fullPermission string, userPer
 			return
 		}
 
-		hasFullPermission := slices.Contains(claims.Permissions, fullPermission)
+		hasFullPermission := slices.Contains(claims.Permissions, fullReqPermission)
 		if hasFullPermission {
 			c.Next()
 			return
 		}
 
-		hasUserPermission := slices.Contains(claims.Permissions, userPermission)
+		hasUserPermission := slices.Contains(claims.Permissions, userReqPermission)
 		if hasUserPermission {
 			reviewId := c.Param("id")
 			userReviews, err := m.reviewService.GetByUserId(c, claims.Sub)
