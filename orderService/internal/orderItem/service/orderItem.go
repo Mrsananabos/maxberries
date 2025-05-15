@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 	"log"
-	"orderService/http/rest/client"
+	"orderService/http/rest/client/product"
 	"orderService/internal/orderItem/model"
 	"orderService/internal/orderItem/repository"
 	"orderService/internal/orderStatus/service"
@@ -14,22 +14,22 @@ import (
 type Service struct {
 	repo               repository.Repository
 	orderStatusService service.Service
-	httpClient         client.HttpClient
+	productHttpClient  product.HttpClient
 	kafkaProducer      kafka.Producer
 }
 
-func NewService(r repository.Repository, orderStatusService service.Service, httpClient client.HttpClient, kafkaProducer kafka.Producer) Service {
+func NewService(r repository.Repository, orderStatusService service.Service, httpClient product.HttpClient, kafkaProducer kafka.Producer) Service {
 	return Service{
 		repo:               r,
 		orderStatusService: orderStatusService,
-		httpClient:         httpClient,
+		productHttpClient:  httpClient,
 		kafkaProducer:      kafkaProducer,
 	}
 }
 
 func (s Service) UpdateItems(orderId int64, newItems model.EditOrderItemsRequest) error {
 	for _, item := range newItems.Items {
-		price, err := s.httpClient.GetProductPrice(item.ProductId)
+		price, err := s.productHttpClient.GetProductPrice(item.ProductId)
 
 		if err != nil {
 			return fmt.Errorf("error getting price for product id = %d", item.ProductId)

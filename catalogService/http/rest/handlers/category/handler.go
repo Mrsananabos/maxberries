@@ -2,10 +2,9 @@ package category
 
 import (
 	"catalogService/internal/category/model"
-	"catalogService/internal/category/repository"
 	category "catalogService/internal/category/service"
+	"catalogService/internal/servicesStorage"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 )
@@ -14,14 +13,14 @@ type Handler struct {
 	service category.Service
 }
 
-func NewHandler(db *gorm.DB) Handler {
+func NewHandler(services servicesStorage.ServicesStorage) Handler {
 	return Handler{
-		service: category.NewService(repository.NewRepository(db)),
+		service: services.CategoryService,
 	}
 }
 
 func (h Handler) GetAllCategories(c *gin.Context) {
-	categories, err := h.service.GetAll()
+	categories, err := h.service.GetAll(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
