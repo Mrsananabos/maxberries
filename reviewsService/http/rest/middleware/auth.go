@@ -49,7 +49,7 @@ func (m Middleware) PermissionCheckMiddleware(requiredPermission string) gin.Han
 	}
 }
 
-func (m Middleware) UserPermissionCheckMiddleware(requiredPermission string) gin.HandlerFunc {
+func (m Middleware) UserPermissionCheckMiddleware(fullPermission string, userPermission string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authToken := c.GetHeader("Authorization")
 		if authToken == "" {
@@ -65,13 +65,14 @@ func (m Middleware) UserPermissionCheckMiddleware(requiredPermission string) gin
 			return
 		}
 
-		hasPermission := slices.Contains(claims.Permissions, requiredPermission)
-		if hasPermission {
-			if claims.Role == "admin" {
-				c.Next()
-				return
-			}
+		hasFullPermission := slices.Contains(claims.Permissions, fullPermission)
+		if hasFullPermission {
+			c.Next()
+			return
+		}
 
+		hasUserPermission := slices.Contains(claims.Permissions, userPermission)
+		if hasUserPermission {
 			reviewId := c.Param("id")
 			userReviews, err := m.reviewService.GetByUserId(c, claims.Sub)
 			if err != nil {
